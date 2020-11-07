@@ -1,16 +1,28 @@
 import { generateQR } from './util'
 import { PDFDocument, StandardFonts } from 'pdf-lib'
 
-const ys = {
-  travail: 578,
-  achats: 533,
-  sante: 477,
-  famille: 435,
-  handicap: 396,
-  sport_animaux: 358,
-  convocation: 295,
-  missions: 255,
-  enfants: 211,
+const ys_fr = {
+  travail: 563,
+  achats: 493,
+  sante: 425,
+  famille: 391,
+  handicap: 350.5,
+  sport_animaux: 317.5,
+  convocation: 225,
+  missions: 194,
+  enfants: 162,
+}
+
+const ys_bzh = {
+  travail: 564.5,
+  achats: 494,
+  sante: 424.5,
+  famille: 393,
+  handicap: 350.5,
+  sport_animaux: 318,
+  convocation: 225,
+  missions: 194,
+  enfants: 162,
 }
 
 export async function generatePdf (profile, reasons, pdfBase) {
@@ -69,15 +81,16 @@ export async function generatePdf (profile, reasons, pdfBase) {
     page1.drawText(text, { x, y, size, font })
   }
 
-  drawText(`${firstname} ${lastname}`, 119, 696)
-  drawText(birthday, 119, 674)
-  drawText(placeofbirth, 297, 674)
-  drawText(`${address} ${zipcode} ${city}`, 133, 652)
+  drawText(`${firstname} ${lastname}`, 110, 700)
+  drawText(birthday, 152, 678)
+  drawText(placeofbirth, 325, 678)
+  drawText(`${address} ${zipcode} ${city}`, 135, 656)
 
   reasons
     .split(', ')
     .forEach(reason => {
-      drawText('x', 78, ys[reason], 18)
+      drawText('x', 42, ys_fr[reason], 10)
+      drawText('x', 303.5, ys_bzh[reason], 10)
     })
 
   let locationSize = getIdealFontSize(font, profile.city, 83, 7, 11)
@@ -90,9 +103,12 @@ export async function generatePdf (profile, reasons, pdfBase) {
     locationSize = 7
   }
 
-  drawText(profile.city, 105, 177, locationSize)
-  drawText(`${profile.datesortie}`, 91, 153, 11)
-  drawText(`${profile.heuresortie}`, 264, 153, 11)
+  drawText(profile.city, 111.5, 110.5, locationSize)
+  drawText(`${profile.datesortie}`, 320, 110.5, 11)
+  const sortie_heure = `${profile.heuresortie.split(":")[0]}`
+  drawText(sortie_heure, 435, 110.5, 11)
+  const sortie_minute = `${profile.heuresortie.split(":")[1]}`
+  drawText(sortie_minute, 485, 110.5, 11)
 
   // const shortCreationDate = `${creationDate.split('/')[0]}/${
   //   creationDate.split('/')[1]
@@ -108,10 +124,10 @@ export async function generatePdf (profile, reasons, pdfBase) {
   const qrImage = await pdfDoc.embedPng(generatedQR)
 
   page1.drawImage(qrImage, {
-    x: page1.getWidth() - 156,
-    y: 100,
-    width: 92,
-    height: 92,
+    x: page1.getWidth() - 90,
+    y: 5,
+    width: 85,
+    height: 85,
   })
 
   pdfDoc.addPage()
